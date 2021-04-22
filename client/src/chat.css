@@ -2,5 +2,89 @@
     display: flex;
     flex-direction: column;
     flex: 0.65;
+}
 
+.chat_header{
+    display: flex;
+    padding: 20px;
+    align-items: center;
+    border-bottom: 1px solid gray;
+}
+
+.chat_header_info{
+    flex:1;
+    padding-left: 20px;
+}
+
+.chat_header_info>p{
+    color: gray;
+}
+
+.chat_body{
+    flex: 1;
+    padding:30px;
+    overflow: scroll;
+}
+
+.chat_content{
+    padding:8px;
+    border-radius: 10px;
+    background-color:white;
+    margin-right: 3px;
+}
+
+.chat_name{
+    margin-bottom: 10px;
+    font-weight: 500;
+    font-size: small;
+}
+
+.chat_time{
+    font-size: xx-small;
+    color: gray;
+}
+
+.chat_message{
+    margin-bottom: 30px;
+    width: fit-content;
+}
+
+.chat_reciever{
+    margin-left: auto;
+}
+
+.chat_content_reciever{
+    background-color: #dcf8c6;
+}
+
+.chat_footer{
+    display: flex;
+    height: 62px;
+    align-items: center;
+    border-top:solid 1px gray ;
+    background-color: rgb(235, 235, 235);
+}
+
+.chat_footer>form{
+  display: flex;
+  flex: 1;
+  padding: 5px;
+ 
+}
+
+.chat_footer>form>input{
+    flex: 1;
+    border-radius: 30px;
+    padding: 10px;
+    height: 30px;
+    border: none;
+  }
+
+.chat_footer>form>button{
+    display: none;
+}
+
+.chat_footer>.MuiSvgIcon-root{
+    padding: 10px;
+    color: gray;
 }
