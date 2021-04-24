@@ -89,13 +89,13 @@ app.post('/signup', async (req, res) => {
 		res.send(userDetails);
 	} catch (error) {
 		console.log(error);
-		res.send('SERVER_ERROR');
+		res.status(500).send(console.error);
 	}
 });
 
 app.post('/login', passport.authenticate('local', {}), (req, res) => {
 	res.send(req.user);
-	console.log(req.session);
+	//console.log(req.session);
 });
 
 app.get('/logout', (req, res) => {

@@ -5,14 +5,12 @@ import './App.css';
 
 import axios from './axios';
 
-function MainComponent() {
+function MainComponent(CURRENT_USER) {
 	let [message, setMessage] = useState([]);
 
-	useEffect(() => {
-		axios.get('http://localhost:2000/').then((response) => {
-			console.log(response);
-		});
-	}, []);
+	//---------ACCESSING THE USER DETAILS-------------
+	//console.log(CURRENT_USER.location.state.user);
+	//----------------------------
 
 	/*useEffect(() => {
     const pusher = new Pusher('1daad050e7d8ba9c63ad', {

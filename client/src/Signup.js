@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useHistory } from 'react-router-dom';
+
 import axios from './axios';
 
 function Copyright() {
@@ -48,6 +49,8 @@ export default function SignIn() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 
+	const [IsError, setIsError] = useState(false);
+
 	const getTimeStamp = () => {
 		let date = new Date();
 		return date.toLocaleString();
@@ -55,13 +58,20 @@ export default function SignIn() {
 
 	const submitForm = async (e) => {
 		e.preventDefault();
-		const user = await axios.post('http://localhost:2000/signup', {
-			username: username,
-			password: password,
-			email: email,
-		});
+		axios
+			.post('http://localhost:2000/signup', {
+				username: username,
+				password: password,
+				email: email,
+			})
+			.then((response) => {
+				history.push('/', { user: response.data });
+			})
+			.catch((error) => setIsError(true));
 
-		history.push('/');
+		//console.log(user.data); //user.data contains the details
+		//CALLING THE HOME PAGE AFTER SIGNUP & SENDING DETAILS OF CURRENT USER THERE !
+		//history.push('/', { user: user.data });
 	};
 
 	return (
@@ -97,6 +107,7 @@ export default function SignIn() {
 						onChange={(e) => setEmail(e.target.value)}
 						autoComplete='email'
 						required
+						type='email'
 						id='standard-required'
 					/>
 					<TextField
@@ -124,6 +135,17 @@ export default function SignIn() {
 					</Button>
 				</form>
 			</div>
+
+			{IsError && (
+				<Box mt={8}>
+					<h3>SOMETHING WENT WRONG!!!</h3>
+					<p>
+						Maybe a user with that username already exist or enter correct email
+						ID.
+					</p>
+				</Box>
+			)}
+
 			<Box mt={8}>
 				<Copyright />
 			</Box>
