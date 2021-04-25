@@ -1,10 +1,9 @@
 import React from 'react';
-
 import { Route, BrowserRouter as Router, Link } from 'react-router-dom';
-
 import Signup from './Signup';
 import Login from './Login';
 import MainComponent from './MainComponent';
+
 function App() {
 	/*useEffect(() => {
     const pusher = new Pusher('1daad050e7d8ba9c63ad', {

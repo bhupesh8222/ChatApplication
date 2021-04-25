@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import queryString from 'query-string';
 import { conversationModel } from './conversation.js';
 import userModel from './user.js';
 import cors from 'cors';
@@ -8,6 +9,11 @@ const port = process.env.PORT || 2000;
 
 const app = express();
 app.use(express.json());
+app.use(
+	express.urlencoded({
+		extended: true,
+	})
+);
 
 app.use(cors());
 app.use(cookieParser());
@@ -120,7 +126,7 @@ app.get('/', (req, res) => {
 
 app.get('/message/get/:friend', isloggedIn, async (req, res) => {
 	try {
-		const conversation = await req.user.conversation.find(
+		const conversation = await req.user.MyConversation.find(
 			(element) => element.friendName == req.params.friend
 		);
 		const messages = await conversationModel.findById(conversation.chats);
@@ -131,15 +137,21 @@ app.get('/message/get/:friend', isloggedIn, async (req, res) => {
 	}
 });
 
-//sendind message to a friend
+//send message to a friend
 
 app.post('/message/add/:friend', isloggedIn, async (req, res) => {
+	console.log('REQUESTED');
+	//console.log(req.params.friend);
 	try {
-		const conversation = await req.user.conversation.find(
+		//console.log(req.user);
+
+		const conversation = req.user.MyConversation.find(
 			(element) => element.friendName == req.params.friend
 		);
 
-		if (conversation) {
+		console.log('CONVERSATION CHATS ', conversation);
+
+		if (conversation.chats) {
 			const messagesFound = await conversationModel.findById(
 				conversation.chats
 			);
@@ -150,25 +162,64 @@ app.post('/message/add/:friend', isloggedIn, async (req, res) => {
 
 		//FIRST TIME SENDING MESSAGE!
 		else {
-			const conversationCreated = await conversationModel.create([req.body]);
+			console.log('FIRST TIME SENDING MESSAGE!');
 
-			await req.user.conversation.push({
-				friendName: req.params.friend,
-				chats: conversationCreated._id,
+			const NewConversation = {
+				messages: [req.body],
+			};
+
+			const conversationCreated = await conversationModel.create(
+				NewConversation
+			);
+
+			console.log(conversationCreated);
+
+			conversation.chats = conversationCreated._id;
+			req.user.save();
+
+			//finding friend
+			const FriendFound = await userModel.findOne({
+				username: req.params.friend,
 			});
 
-			const FriendFound = await userModel.find({ username: req.params.friend });
+			console.log('FRIEND FOUND', FriendFound);
 
-			await FriendFound.conversation.push({
-				friendName: req.user.username,
-				chats: conversationCreated._id,
-			});
+			//finding conversation
+			const FriendConversation = await FriendFound.MyConversation.find(
+				(element) => element.friendName == req.user.username
+			);
 
-			res.send(conversationCreated);
+			FriendConversation.chats = conversationCreated._id;
+
+			FriendFound.save();
+
+			res.send(conversationCreated.messages);
 		}
 	} catch (error) {
 		res.status(500).send(error);
 	}
+});
+
+//add friend
+app.post('/add', async (req, res) => {
+	console.log('add');
+
+	const FriendFound = await userModel.findOne({ username: req.body.friend });
+	console.log(FriendFound);
+
+	await FriendFound.MyConversation.push({
+		friendName: req.user.username,
+	});
+
+	await FriendFound.save();
+
+	await req.user.MyConversation.push({
+		friendName: req.body.friend,
+	});
+
+	await req.user.save();
+
+	res.send(req.user);
 });
 
 /*app.post("/addfriend",isloggedIn, async(req,res)=>{

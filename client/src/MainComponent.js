@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from './Sidebar.js';
 import Chat from './Chat.js';
 import './App.css';
-
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 import axios from './axios';
 
 function MainComponent(CURRENT_USER) {
@@ -27,7 +30,7 @@ function MainComponent(CURRENT_USER) {
 	return (
 		<div className='app'>
 			<div className='app_components'>
-				<Sidebar />
+				<Sidebar CURRENT_USER={CURRENT_USER} />
 				<Chat message={message} />
 			</div>
 		</div>

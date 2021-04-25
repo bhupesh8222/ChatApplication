@@ -1,17 +1,17 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const conversationSchema = new mongoose.Schema({
-    messages:[
-        {
-            text : String,
-            timestamp : String,
-            sender : String,
-            reciever : String
-        }
-    ]
-})
+	messages: [
+		{
+			text: String,
+			timestamp: String,
+			sender: String,
+			reciever: String,
+		},
+	],
+});
 
-const conversationModel = mongoose.model("conversation", conversationSchema);
+const conversationModel = mongoose.model('conversation', conversationSchema);
 
 /*conversationModel.create({
     friendName : "Bhupesh",
@@ -22,4 +22,4 @@ const conversationModel = mongoose.model("conversation", conversationSchema);
         reciever : "String"
     }]
 })*/
-export {conversationModel, conversationSchema}; 
+export { conversationModel, conversationSchema };

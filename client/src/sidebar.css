@@ -6,6 +6,7 @@
 
 .sidebar_header{
     display: flex;
+    align-items: center;
     justify-content: space-between;
     padding: 20px;
     border-right: 1px solid lightgray;
@@ -17,16 +18,24 @@
     min-width: 10vw;
 }
 
+.btn__{
+    font-size: small;
+}
+
 .sidebar_search{
     display: flex;
-    align-items: center;
-    height: 35px;
-   
+    justify-content: space-between;
 }
+
 .sidebar_search > input{
     border:none;
     width: 100%;
     margin-left: 10px;
     height: 35px;
     border-radius: 1 0px;
+}
+
+.user{
+    font-size: small;
+    margin-left: 4px;
 }
