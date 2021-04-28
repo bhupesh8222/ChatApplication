@@ -124,10 +124,12 @@ app.get('/', (req, res) => {
 
 //route to see conversation with a friend
 
-app.get('/message/get/:friend', isloggedIn, async (req, res) => {
+app.post('/message/get', isloggedIn, async (req, res) => {
+	console.log('REQUESTED!');
+
 	try {
 		const conversation = await req.user.MyConversation.find(
-			(element) => element.friendName == req.params.friend
+			(element) => element.friendName == req.body.friend
 		);
 		const messages = await conversationModel.findById(conversation.chats);
 		res.send(messages);
@@ -201,7 +203,7 @@ app.post('/message/add/:friend', isloggedIn, async (req, res) => {
 });
 
 //add friend
-app.post('/add', async (req, res) => {
+app.post('/add', isloggedIn, async (req, res) => {
 	console.log('add');
 
 	const FriendFound = await userModel.findOne({ username: req.body.friend });

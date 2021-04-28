@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './sidebar.css';
 import ChatIcon from '@material-ui/icons/Chat';
 import DonutLargeIcon from '@material-ui/icons/DonutLarge';
@@ -6,24 +6,45 @@ import { Avatar, IconButton } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Button from '@material-ui/core/Button';
-import SidebarChat from './SidebarChat';
-import axios from './axios';
+
+import axios from 'axios';
 
 function Sidebar(CURRENT_USER) {
-	useEffect(() => {
+	const [friends, setFriends] = useState(
+		CURRENT_USER.userDetails.MyConversation
+	);
+
+	let user = CURRENT_USER.userDetails;
+
+	const getLastMessage = () => {
+		return 'This is the last message sent.....';
+	};
+
+	const getChatDetails = (e) => {
+		//console.log(e.target.textContent);
+		const Myfriend = e.target.textContent;
+		axios
+			.post('http://localhost:2000/message/get', { friend: Myfriend })
+			.then((response) => {
+				console.log(response);
+			})
+			.catch((error) => console.log(error));
+	};
+	/*useEffect(() => {
 		axios
 			.post('/message/add/Hello')
 			.then((response) => {
 				console.log(response.data);
 			})
 			.catch((error) => console.log(error));
-	}, []);
+	}, []);*/
+
 	return (
 		<div className='sidebar'>
 			<div className='sidebar_header'>
 				<div>
 					<Avatar />
-					<div className='user'>USER</div>
+					<div className='user'>{user.username}</div>
 				</div>
 
 				<Button className='btn__' variant='outlined'>
@@ -35,8 +56,20 @@ function Sidebar(CURRENT_USER) {
 				<input type='text' placeholder='Search or start new chat'></input>
 			</div>
 			<div className='sidebar_chatArea'>
-				<SidebarChat />
-				<SidebarChat />
+				<div className='sidebar_chat'>
+					{friends.map((e) => (
+						<div
+							onClick={getChatDetails}
+							key={e.friendName}
+							className='sidebar_chat_info'>
+							<Avatar />
+							<div>
+								<h2>{e.friendName}</h2>
+								<p>{getLastMessage()}</p>
+							</div>
+						</div>
+					))}
+				</div>
 			</div>
 		</div>
 	);

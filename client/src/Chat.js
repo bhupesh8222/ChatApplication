@@ -7,7 +7,8 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
 import axios from './axios';
 
-function Chat({ message }) {
+function Chat(CURRENT_USER) {
+	console.log(CURRENT_USER.userDetails);
 	const [input, setInput] = useState(' ');
 
 	const sendMessage = async (e) => {
@@ -42,14 +43,14 @@ function Chat({ message }) {
 				</div>
 			</div>
 			<div className='chat_body'>
-				{message.map((m) => (
+				{/* {message.map((m) => (
 					<div key={m._id} className='chat_message'>
 						<p className='chat_name'>{m.username}</p>
 						<span className='chat_content'>
 							{m.message} <span className='chat_time'>{m.timestamp}</span>
 						</span>
 					</div>
-				))}
+				))}  */}
 			</div>
 			<div className='chat_footer'>
 				<InsertEmoticonIcon />
