@@ -5,22 +5,57 @@ import { conversationModel } from './conversation.js';
 import userModel from './user.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import passportLocalMongoose from 'passport-local-mongoose';
+import passport from 'passport';
+import expressSession from 'express-session';
+import passportLocal from 'passport-local';
 const port = process.env.PORT || 2000;
 
 const app = express();
+
 app.use(express.json());
+
 app.use(
 	express.urlencoded({
 		extended: true,
 	})
 );
 
-app.use(cors());
-app.use(cookieParser());
+//WE CAN MAKE CORS POSSIBLE W/O CORS LIBRARY
+//cors library is doing these stuffs for us, i.e setting the access-control-allow-origin-response
 
-import passport from 'passport';
-import expressSession from 'express-session';
-import passportLocal from 'passport-local';
+app.use(function (req, res, next) {
+	// Website you wish to allow to connect
+	res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+
+	// Request methods you wish to allow
+	res.setHeader(
+		'Access-Control-Allow-Methods',
+		'GET, POST, OPTIONS, PUT, PATCH, DELETE'
+	);
+
+	// Request headers you wish to allow
+	res.setHeader(
+		'Access-Control-Allow-Headers',
+		'X-Requested-With,content-type'
+	);
+
+	// Set to true if you need the website to include cookies in the requests sent
+	// to the API (e.g. in case you use sessions)
+	res.setHeader('Access-Control-Allow-Credentials', true);
+
+	// Pass to next layer of middleware
+	next();
+});
+
+/*app.use(
+	cors({
+		origin: 'http://localhost:3000',
+		credentials: true,
+	})
+);*/
+app.use(cookieParser('This is the secret'));
+
 //import passportLocalMongoose from "passport-local-mongoose";
 
 app.use(
@@ -99,10 +134,14 @@ app.post('/signup', async (req, res) => {
 	}
 });
 
-app.post('/login', passport.authenticate('local', {}), (req, res) => {
-	res.send(req.user);
-	//console.log(req.session);
-});
+app.post(
+	'/login',
+	passport.authenticate('local', { session: true }),
+	(req, res) => {
+		res.send(req.user);
+		//console.log(req.session);
+	}
+);
 
 app.get('/logout', (req, res) => {
 	req.logout();
@@ -114,19 +153,18 @@ function isloggedIn(req, res, next) {
 	if (req.isAuthenticated()) {
 		return next();
 	} else {
+		console.log('NOT LOGGED IN !');
 		res.status(500).send('DENIED PERMISSION!');
 	}
 }
 
-app.get('/', (req, res) => {
+app.get('/', isloggedIn, (req, res) => {
 	res.send(req.user);
 });
 
 //route to see conversation with a friend
 
-app.post('/message/get', isloggedIn, async (req, res) => {
-	console.log('REQUESTED!');
-
+app.post('/chats', isloggedIn, async (req, res) => {
 	try {
 		const conversation = await req.user.MyConversation.find(
 			(element) => element.friendName == req.body.friend
@@ -135,20 +173,21 @@ app.post('/message/get', isloggedIn, async (req, res) => {
 		res.send(messages);
 		//await MessageModel.remove({})
 	} catch (error) {
+		console.log(error);
 		res.status(500).send(error);
 	}
 });
 
 //send message to a friend
 
-app.post('/message/add/:friend', isloggedIn, async (req, res) => {
+app.post('/message/add', isloggedIn, async (req, res) => {
 	console.log('REQUESTED');
 	//console.log(req.params.friend);
 	try {
-		//console.log(req.user);
+		//console.log(req.body.friend);
 
 		const conversation = req.user.MyConversation.find(
-			(element) => element.friendName == req.params.friend
+			(element) => element.friendName == req.body.reciever
 		);
 
 		console.log('CONVERSATION CHATS ', conversation);
@@ -181,7 +220,7 @@ app.post('/message/add/:friend', isloggedIn, async (req, res) => {
 
 			//finding friend
 			const FriendFound = await userModel.findOne({
-				username: req.params.friend,
+				username: req.body.friend,
 			});
 
 			console.log('FRIEND FOUND', FriendFound);

@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useHistory } from 'react-router-dom';
-import axios from 'axios';
+import axios from './axios';
 
 function Copyright() {
 	return (
@@ -48,7 +48,7 @@ export default function SignIn(x) {
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 
-	const submitForm = async (e) => {
+	const submitForm = (e) => {
 		e.preventDefault();
 		axios
 			.post('http://localhost:2000/login', {
@@ -56,6 +56,7 @@ export default function SignIn(x) {
 				password: password,
 			})
 			.then((response) => {
+				console.log(response);
 				history.push('/', { user: response.data });
 			})
 			.catch((error) => setIsError(true));

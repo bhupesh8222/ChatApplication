@@ -7,29 +7,26 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Button from '@material-ui/core/Button';
 
-import axios from 'axios';
+import axios from './axios';
 
-function Sidebar(CURRENT_USER) {
-	const [friends, setFriends] = useState(
-		CURRENT_USER.userDetails.MyConversation
-	);
-
-	let user = CURRENT_USER.userDetails;
+function Sidebar(props) {
+	const [friends, setFriends] = useState(props.userDetails.MyConversation);
+	let user = props.userDetails;
 
 	const getLastMessage = () => {
 		return 'This is the last message sent.....';
 	};
 
-	const getChatDetails = (e) => {
+	/*const getChatDetails = (e) => {
 		//console.log(e.target.textContent);
-		const Myfriend = e.target.textContent;
+		const myfriend = e.target.textContent;
 		axios
-			.post('http://localhost:2000/message/get', { friend: Myfriend })
+			.post('http://localhost:2000/chats', { friend: myfriend })
 			.then((response) => {
 				console.log(response);
 			})
 			.catch((error) => console.log(error));
-	};
+	};*/
 	/*useEffect(() => {
 		axios
 			.post('/message/add/Hello')
@@ -59,7 +56,7 @@ function Sidebar(CURRENT_USER) {
 				<div className='sidebar_chat'>
 					{friends.map((e) => (
 						<div
-							onClick={getChatDetails}
+							onClick={(e) => props.getChatDetails(e)}
 							key={e.friendName}
 							className='sidebar_chat_info'>
 							<Avatar />

@@ -11,11 +11,43 @@ import axios from './axios';
 
 function MainComponent(CURRENT_USER) {
 	const [message, setMessage] = useState([]);
+	const [curretFriend, setcurrentFriend] = useState();
+	const [input, setInput] = useState(' ');
+
+	const sendMessage = async (e) => {
+		e.preventDefault();
+		axios
+			.post('http://localhost:2000/message/add', {
+				text: input,
+				sender: CURRENT_USER.location.state.user.username,
+				reciever: curretFriend,
+			})
+			.then((res) => {
+				console.log(res.data);
+			})
+			.catch((err) => console.log(err));
+		setInput(' ');
+	};
+
+	const getChatDetails = (e) => {
+		//console.log(e.target.textContent);
+		const myfriend = e.target.textContent;
+		axios
+			.post('http://localhost:2000/chats', { friend: myfriend })
+			.then((response) => {
+				//console.log(response.data.messages);
+				setMessage(response.data.messages);
+				setcurrentFriend(myfriend);
+			})
+			.catch((error) => console.log(error));
+	};
+
 	//---------ACCESSING THE USER DETAILS-------------
 	//console.log(CURRENT_USER.location.state.user);
 	//----------------------------
 	const userDetails = CURRENT_USER.location.state.user;
-	console.log(userDetails);
+	//console.log(userDetails);
+
 	//console.log(CURRENT_USER.location.state.user);
 	/*useEffect(() => {
     const pusher = new Pusher('1daad050e7d8ba9c63ad', {
@@ -35,8 +67,14 @@ function MainComponent(CURRENT_USER) {
 		<div className='app'>
 			{CURRENT_USER.location.state && (
 				<div className='app_components'>
-					<Sidebar userDetails={userDetails} />
-					<Chat userDetails={userDetails} />
+					<Sidebar userDetails={userDetails} getChatDetails={getChatDetails} />
+					<Chat
+						message={message}
+						curretFriend={curretFriend}
+						sendMessage={sendMessage}
+						setInput={setInput}
+						input={input}
+					/>
 				</div>
 			)}
 			{!CURRENT_USER.location.state && (
