@@ -8,15 +8,15 @@ import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
 import axios from './axios';
 
 function Chat(props) {
+	//console.log(props.message);
 	return (
 		<div className='chat'>
-			{props.curretFriend && (
+			{props.currentFriend && (
 				<>
 					<div className='chat_header'>
 						<Avatar />
 						<div className='chat_header_info'>
-							<h3>{props.curretFriend}</h3>
-							<p>Last Seen........</p>
+							<h3>{props.currentFriend}</h3>
 						</div>
 						<div className='chat_header_right'>
 							<IconButton>

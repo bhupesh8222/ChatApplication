@@ -10,7 +10,7 @@ import passport from 'passport';
 import expressSession from 'express-session';
 import passportLocal from 'passport-local';
 const port = process.env.PORT || 2000;
-
+import Pusher from 'pusher';
 const app = express();
 
 app.use(express.json());
@@ -73,46 +73,41 @@ passport.use(new passportLocal(userModel.authenticate()));
 passport.serializeUser(userModel.serializeUser());
 passport.deserializeUser(userModel.deserializeUser());
 
-/*const pusher = new Pusher({
-    appId: "1192384",
-    key: "1daad050e7d8ba9c63ad",
-    secret: "b8d11efded9f95ec538a",
-    cluster: "ap2",
-    useTLS: true
-  });*/
+const pusher = new Pusher({
+	appId: '1192384',
+	key: '1daad050e7d8ba9c63ad',
+	secret: 'b8d11efded9f95ec538a',
+	cluster: 'ap2',
+	useTLS: true,
+});
 
 const url =
 	'mongodb+srv://bhupesh:bhupesh@cluster0.etje3.mongodb.net/ChatApp?retryWrites=true&w=majority';
 
-mongoose
-	.connect(url, {
-		useCreateIndex: true,
-		useUnifiedTopology: true,
-		useNewUrlParser: true,
-	})
-	.then(() => {
-		console.log('DB CONNECTED!');
+mongoose.connect(url, {
+	useCreateIndex: true,
+	useUnifiedTopology: true,
+	useNewUrlParser: true,
+});
 
-		/*const db= mongoose.connection;
-
-    const msgCollection = db.collection("chatmessages");
-    const changeStream = msgCollection.watch();
-    changeStream.on("change", (change, error)=>{
-      if(change.operationType=="insert")
-       {
-           const msgDetails = change.fullDocument;
-           pusher.trigger("messages" , "inserted", {
-               username : msgDetails.username,
-               message : msgDetails.message,
-               timestamp:msgDetails.message.timestamp
-           })
-       }
-       else{
-           console.log("PUSHER ERROR!", error);
-       }
-    })*/
+const db = mongoose.connection;
+db.once('open', () => {
+	console.log('CONNECTED');
+	const msgCollection = db.collection('conversations');
+	const changeStream = msgCollection.watch();
+	changeStream.on('change', (change) => {
+		console.log(change);
+		if (change.operationType == 'update') {
+			const msgDetails = change.updateDescription.updatedFields;
+			console.log('Messgae Deials', msgDetails);
+			let data = Object.values(msgDetails)[1];
+			console.log(data);
+			pusher.trigger('messages', 'inserted', data);
+		} else {
+			console.log('PUSHER ERROR!');
+		}
 	});
-
+});
 ///-------------------------------------ROUTES----------------------------------------------
 
 //---------------------------------------AUTH-----------------------------------------------
@@ -144,7 +139,9 @@ app.post(
 );
 
 app.get('/logout', (req, res) => {
+	console.log('LOGGEDOUT!');
 	req.logout();
+	res.send('Logged Out!');
 });
 
 //-----------------------------OTHER ROUTES---------------------------
@@ -202,7 +199,7 @@ app.post('/message/add', isloggedIn, async (req, res) => {
 		}
 
 		//FIRST TIME SENDING MESSAGE!
-		else {
+		/*else {
 			console.log('FIRST TIME SENDING MESSAGE!');
 
 			const NewConversation = {
@@ -235,7 +232,7 @@ app.post('/message/add', isloggedIn, async (req, res) => {
 			FriendFound.save();
 
 			res.send(conversationCreated.messages);
-		}
+		}*/
 	} catch (error) {
 		res.status(500).send(error);
 	}
@@ -245,18 +242,47 @@ app.post('/message/add', isloggedIn, async (req, res) => {
 app.post('/add', isloggedIn, async (req, res) => {
 	console.log('add');
 
+	//creating conversation
+	const NewConversation = {
+		messages: [
+			{
+				text: 'System Generated first Message',
+				sender: req.user.username,
+				reciever: req.body.friend,
+			},
+		],
+	};
+
+	const conversationCreated = await conversationModel.create(NewConversation);
+
+	//Adding friend
+
 	const FriendFound = await userModel.findOne({ username: req.body.friend });
 	console.log(FriendFound);
 
-	await FriendFound.MyConversation.push({
+	FriendFound.MyConversation = await [{ friendName: req.user.username }].concat(
+		FriendFound.MyConversation
+	);
+
+	//linking the chats
+	FriendFound.MyConversation[0].chats = conversationCreated;
+
+	/*await FriendFound.MyConversation.push({
 		friendName: req.user.username,
-	});
+	});*/
 
 	await FriendFound.save();
 
-	await req.user.MyConversation.push({
+	req.user.MyConversation = await [{ friendName: req.body.friend }].concat(
+		req.user.MyConversation
+	);
+
+	//linking the chats
+	req.user.MyConversation[0].chats = conversationCreated;
+
+	/*await req.user.MyConversation.push({
 		friendName: req.body.friend,
-	});
+	});*/
 
 	await req.user.save();
 
@@ -268,6 +294,17 @@ app.post('/add', isloggedIn, async (req, res) => {
     //req.user contains the details of the user in the current session
     
 })*/
+
+app.post('/lastmessage', isloggedIn, async (req, res) => {
+	const friend = req.body.friend;
+	const conversation = req.user.MyConversation.find(
+		(element) => element.friendName == friend
+	);
+
+	const chats = await conversationModel.findById(conversation.chats);
+	//console.log(chats);
+	res.send(chats.messages[chats.messages.length - 1].text);
+});
 
 app.listen(port, () => {
 	console.log('SERVER STARTED!');

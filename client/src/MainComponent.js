@@ -8,11 +8,28 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import axios from './axios';
+import Pusher from 'pusher-js';
+import { useHistory } from 'react-router-dom';
 
 function MainComponent(CURRENT_USER) {
+	const history = useHistory();
 	const [message, setMessage] = useState([]);
-	const [curretFriend, setcurrentFriend] = useState();
+	const [currentFriend, setcurrentFriend] = useState();
 	const [input, setInput] = useState(' ');
+
+	useEffect(() => {
+		const pusher = new Pusher('1daad050e7d8ba9c63ad', {
+			cluster: 'ap2',
+		});
+		Pusher.logToConsole = true;
+
+		var channel = pusher.subscribe('messages');
+		channel.bind('inserted', (data) => {
+			console.log('NewMessge from pusher', data);
+			//alert(JSON.stringify(data));
+			setMessage([...message, data]);
+		});
+	}, [message]);
 
 	const sendMessage = async (e) => {
 		e.preventDefault();
@@ -20,17 +37,21 @@ function MainComponent(CURRENT_USER) {
 			.post('http://localhost:2000/message/add', {
 				text: input,
 				sender: CURRENT_USER.location.state.user.username,
-				reciever: curretFriend,
+				reciever: currentFriend,
 			})
 			.then((res) => {
-				console.log(res.data);
+				//setMessage(res.data);
 			})
 			.catch((err) => console.log(err));
 		setInput(' ');
 	};
 
-	const getChatDetails = (e) => {
-		//console.log(e.target.textContent);
+	const Logout = async () => {
+		await axios.get('http://localhost:2000/logout');
+		history.push('/login');
+	};
+
+	const getChatDetails = async (e) => {
 		const myfriend = e.target.textContent;
 		axios
 			.post('http://localhost:2000/chats', { friend: myfriend })
@@ -49,17 +70,6 @@ function MainComponent(CURRENT_USER) {
 	//console.log(userDetails);
 
 	//console.log(CURRENT_USER.location.state.user);
-	/*useEffect(() => {
-    const pusher = new Pusher('1daad050e7d8ba9c63ad', {
-      cluster: 'ap2'
-    });
-
-    var channel = pusher.subscribe('messages');
-    channel.bind('inserted', (newMessage)=> {
-      setMessage([...message, newMessage]);
-    });
-    setMessage()
-  }, [message])*/
 
 	//REDIRECTING TO THE MAIN PAGE FROM EITHER LOGIN/SIGNUP, so CURRENT_USER.location.state contains the details of user
 
@@ -67,14 +77,20 @@ function MainComponent(CURRENT_USER) {
 		<div className='app'>
 			{CURRENT_USER.location.state && (
 				<div className='app_components'>
-					<Sidebar userDetails={userDetails} getChatDetails={getChatDetails} />
-					<Chat
-						message={message}
-						curretFriend={curretFriend}
-						sendMessage={sendMessage}
-						setInput={setInput}
-						input={input}
+					<Sidebar
+						userDetails={userDetails}
+						getChatDetails={getChatDetails}
+						Logout={Logout}
 					/>
+					{message && (
+						<Chat
+							message={message}
+							currentFriend={currentFriend}
+							sendMessage={sendMessage}
+							setInput={setInput}
+							input={input}
+						/>
+					)}
 				</div>
 			)}
 			{!CURRENT_USER.location.state && (
