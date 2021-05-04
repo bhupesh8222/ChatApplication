@@ -38,6 +38,7 @@ function MainComponent(CURRENT_USER) {
 				text: input,
 				sender: CURRENT_USER.location.state.user.username,
 				reciever: currentFriend,
+				timestamp: new Date().toLocaleString(),
 			})
 			.then((res) => {
 				//setMessage(res.data);
@@ -89,6 +90,7 @@ function MainComponent(CURRENT_USER) {
 							sendMessage={sendMessage}
 							setInput={setInput}
 							input={input}
+							currentUser={userDetails.username}
 						/>
 					)}
 				</div>

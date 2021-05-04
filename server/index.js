@@ -240,53 +240,54 @@ app.post('/message/add', isloggedIn, async (req, res) => {
 
 //add friend
 app.post('/add', isloggedIn, async (req, res) => {
-	console.log('add');
+	try {
+		const NewConversation = {
+			messages: [
+				{
+					text: 'System Generated first Message',
+					sender: req.user.username,
+					reciever: req.body.friend,
+				},
+			],
+		};
 
-	//creating conversation
-	const NewConversation = {
-		messages: [
-			{
-				text: 'System Generated first Message',
-				sender: req.user.username,
-				reciever: req.body.friend,
-			},
-		],
-	};
+		const conversationCreated = await conversationModel.create(NewConversation);
 
-	const conversationCreated = await conversationModel.create(NewConversation);
+		//Adding friend
 
-	//Adding friend
+		const FriendFound = await userModel.findOne({ username: req.body.friend });
+		console.log(FriendFound);
 
-	const FriendFound = await userModel.findOne({ username: req.body.friend });
-	console.log(FriendFound);
+		FriendFound.MyConversation = await [
+			{ friendName: req.user.username },
+		].concat(FriendFound.MyConversation);
 
-	FriendFound.MyConversation = await [{ friendName: req.user.username }].concat(
-		FriendFound.MyConversation
-	);
+		//linking the chats
+		FriendFound.MyConversation[0].chats = conversationCreated;
 
-	//linking the chats
-	FriendFound.MyConversation[0].chats = conversationCreated;
+		/*await FriendFound.MyConversation.push({
+			friendName: req.user.username,
+		});*/
 
-	/*await FriendFound.MyConversation.push({
-		friendName: req.user.username,
-	});*/
+		await FriendFound.save();
 
-	await FriendFound.save();
+		req.user.MyConversation = await [{ friendName: req.body.friend }].concat(
+			req.user.MyConversation
+		);
 
-	req.user.MyConversation = await [{ friendName: req.body.friend }].concat(
-		req.user.MyConversation
-	);
+		//linking the chats
+		req.user.MyConversation[0].chats = conversationCreated;
 
-	//linking the chats
-	req.user.MyConversation[0].chats = conversationCreated;
+		/*await req.user.MyConversation.push({
+			friendName: req.body.friend,
+		});*/
 
-	/*await req.user.MyConversation.push({
-		friendName: req.body.friend,
-	});*/
+		await req.user.save();
 
-	await req.user.save();
-
-	res.send(req.user);
+		res.send(req.user);
+	} catch (error) {
+		res.status(500).send(error);
+	}
 });
 
 /*app.post("/addfriend",isloggedIn, async(req,res)=>{
@@ -296,14 +297,30 @@ app.post('/add', isloggedIn, async (req, res) => {
 })*/
 
 app.post('/lastmessage', isloggedIn, async (req, res) => {
-	const friend = req.body.friend;
-	const conversation = req.user.MyConversation.find(
-		(element) => element.friendName == friend
-	);
+	try {
+		const friend = req.body.friend;
+		const conversation = req.user.MyConversation.find(
+			(element) => element.friendName == friend
+		);
 
-	const chats = await conversationModel.findById(conversation.chats);
-	//console.log(chats);
-	res.send(chats.messages[chats.messages.length - 1].text);
+		const chats = await conversationModel.findById(conversation.chats);
+		//console.log(chats);
+		res.send(chats.messages[chats.messages.length - 1].text);
+	} catch (error) {
+		res.status(500).send(error);
+	}
+});
+
+//Search User
+
+app.post('/searchuser', isloggedIn, async (req, res) => {
+	try {
+		const user = await userModel.findOne({ username: req.body.userName });
+		if (!user) res.send('No user exist!');
+		if (user) res.send(user);
+	} catch (error) {
+		res.status(500).send(error);
+	}
 });
 
 app.listen(port, () => {

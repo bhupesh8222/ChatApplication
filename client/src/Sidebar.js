@@ -13,17 +13,67 @@ import axios from './axios';
 function Sidebar(props) {
 	const history = useHistory();
 	const [friends, setFriends] = useState(props.userDetails.MyConversation);
-	const [found, setfound] = useState(false);
-	const [inputValue, setinputValue] = useState(' ');
+	const [gotError, setgotError] = useState(false);
+	const [inputValue, setinputValue] = useState('');
+	const [foundUser, setfoundUser] = useState();
+	const [currentActive, setcurrentActive] = useState();
 	let user = props.userDetails;
 
-	const SearchUser = () => {};
-	const getLastMessage = (f) => {
+	const SearchUser = (e) => {
+		e.preventDefault();
+		axios
+			.post('http://localhost:2000/searchuser', { userName: inputValue })
+			.then((res) => {
+				if (!res.data.username) {
+					setgotError(true);
+				} else if (res.data.username) {
+					setfoundUser(res.data.username);
+				}
+			})
+			.catch((err) => console.log(err));
+	};
+
+	/*const getLastMessage = (f) => {
 		axios
 			.post('http://localhost:2000/lastmessage', { friend: f })
 			.then((res) => {
 				return res.data;
 			});
+	};*/
+
+	const onChangeInput = (e) => {
+		//RESETTING USER & ERROR
+		setgotError(false);
+		setfoundUser();
+		setinputValue(e.target.value);
+	};
+
+	//FOR CHECKING WHETHER WE ARE SENDING REQUEST TO EXISTING FRIEND
+	const Isfriend = (name) => {
+		for (let i = 0; i < user.MyConversation.length; i = i + 1) {
+			if (user.MyConversation[i].friendName == name) return true;
+		}
+		return false;
+	};
+
+	//POTENTIAL BUG
+	const AddFriend = () => {
+		axios
+			.post('http://localhost:2000/add', { friend: foundUser })
+			.then((res) => {
+				console.log(res.data);
+				user = res.data;
+				setinputValue('');
+				setFriends(res.data.MyConversation);
+				history.push('/', { user: res.data });
+			});
+	};
+
+	const chatDetailsBgColor = (e) => {
+		props.getChatDetails(e);
+
+		//change background
+		console.log('BG');
 	};
 
 	return (
@@ -34,16 +84,20 @@ function Sidebar(props) {
 					<div className='user'>{user.username}</div>
 				</div>
 
-				<Button className='btn__' variant='outlined' onClick={props.Logout}>
+				<Button
+					className='btn__'
+					variant='contained'
+					color='secondary'
+					onClick={props.Logout}>
 					Logout
 				</Button>
 			</div>
 
-			<form onSubmit={SearchUser}>
+			<form onSubmit={(e) => SearchUser(e)}>
 				<input
 					id='searchFriend'
 					value={inputValue}
-					onChange={(e) => setinputValue(e.target.value)}
+					onChange={(e) => onChangeInput(e)}
 					type='text'
 					placeholder='Search for a friend'></input>
 				<button>SUBMIT</button>
@@ -55,9 +109,7 @@ function Sidebar(props) {
 							<div key={e.friendName} className='sidebar_chat_info'>
 								<Avatar />
 								<div>
-									<h2 onClick={(e) => props.getChatDetails(e)}>
-										{e.friendName}
-									</h2>
+									<h2 onClick={(e) => chatDetailsBgColor(e)}>{e.friendName}</h2>
 									<h3>{/*getLastMessage(e.friendName)*/}</h3>
 								</div>
 							</div>
@@ -68,29 +120,41 @@ function Sidebar(props) {
 
 			{inputValue && (
 				<div>
-					{!found && (
+					{!foundUser && (
 						<div className='addfriend'>
-							<CircularProgress color='secondary' />
+							<div>
+								<CircularProgress color='secondary' />
+							</div>
 						</div>
 					)}
 
-					{found && (
+					{foundUser && (
 						<>
 							<div className='addfriend'>
-								<h3>USER FOUND!</h3>
+								<h4>USER FOUND!</h4>
 							</div>
 
 							<div className='sidebar_chat_info foundUser'>
 								<Avatar />
 								<div>
-									<h2>SEARCHED</h2>
+									<h2>{foundUser}</h2>
 									<h3>{/*getLastMessage(e.friendName)*/}</h3>
 								</div>
 							</div>
 							<div className='addfriend'>
-								<Button variant='contained'>Add friend</Button>
+								{user.username != foundUser && !Isfriend(foundUser) && (
+									<Button
+										variant='contained'
+										color='secondary'
+										onClick={AddFriend}>
+										Add Friend
+									</Button>
+								)}
 							</div>
 						</>
+					)}
+					{gotError && (
+						<div className='userError'>No user with such name exist</div>
 					)}
 				</div>
 			)}

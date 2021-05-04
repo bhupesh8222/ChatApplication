@@ -51,9 +51,14 @@
 
 .chat_reciever{
     margin-left: auto;
+    margin-bottom: 30px;
+    width: fit-content;
 }
 
 .chat_content_reciever{
+    padding:8px;
+    border-radius: 10px;
+    margin-right: 3px;
     background-color: #dcf8c6;
 }
 

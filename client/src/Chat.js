@@ -8,7 +8,6 @@ import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
 import axios from './axios';
 
 function Chat(props) {
-	//console.log(props.message);
 	return (
 		<div className='chat'>
 			{props.currentFriend && (
@@ -32,10 +31,23 @@ function Chat(props) {
 					</div>
 					<div className='chat_body'>
 						{props.message.map((m) => (
-							<div key={m._id} className='chat_message'>
-								<p className='chat_name'>{m.sender}</p>
-								<span className='chat_content'>
-									{m.text} <span className='chat_time'></span>
+							<div
+								key={m._id}
+								className={
+									m.sender == props.currentUser
+										? 'chat_reciever'
+										: 'chat_message'
+								}>
+								<p className='chat_name'>
+									{m.sender == props.currentUser ? 'Me' : m.sender}
+								</p>
+								<span
+									className={
+										m.sender == props.currentUser
+											? 'chat_content_reciever'
+											: 'chat_content'
+									}>
+									{m.text} <span className='chat_time'>{m.timestamp}</span>
 								</span>
 							</div>
 						))}
