@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './sidebar.css';
 import ChatIcon from '@material-ui/icons/Chat';
 import DonutLargeIcon from '@material-ui/icons/DonutLarge';
@@ -17,6 +17,8 @@ function Sidebar(props) {
 	const [inputValue, setinputValue] = useState('');
 	const [foundUser, setfoundUser] = useState();
 	const [currentActive, setcurrentActive] = useState();
+	const element = useRef(null);
+	const [Selected, setSelected] = useState();
 	let user = props.userDetails;
 
 	const SearchUser = (e) => {
@@ -65,15 +67,13 @@ function Sidebar(props) {
 				user = res.data;
 				setinputValue('');
 				setFriends(res.data.MyConversation);
-				history.push('/', { user: res.data });
+				history.push('/app', { user: res.data });
 			});
 	};
 
 	const chatDetailsBgColor = (e) => {
 		props.getChatDetails(e);
-
-		//change background
-		console.log('BG');
+		setSelected(e.target.innerText);
 	};
 
 	return (
@@ -81,9 +81,8 @@ function Sidebar(props) {
 			<div className='sidebar_header'>
 				<div>
 					<Avatar />
-					<div className='user'>{user.username}</div>
 				</div>
-
+				<div className='user'>{user.username}</div>
 				<Button
 					className='btn__'
 					variant='contained'
@@ -106,11 +105,17 @@ function Sidebar(props) {
 				<div className='sidebar_chatArea'>
 					<div className='sidebar_chat'>
 						{friends.map((e) => (
-							<div key={e.friendName} className='sidebar_chat_info'>
+							<div
+								key={e.friendName}
+								className='sidebar_chat_info'
+								style={{
+									backgroundColor: Selected === e.friendName ? 'thistle' : '',
+								}}
+								ref={element}>
 								<Avatar />
 								<div>
 									<h2 onClick={(e) => chatDetailsBgColor(e)}>{e.friendName}</h2>
-									<h3>{/*getLastMessage(e.friendName)*/}</h3>
+									<div>{/*getLastMessage(e.friendName)*/}</div>
 								</div>
 							</div>
 						))}

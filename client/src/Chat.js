@@ -1,5 +1,5 @@
 import { Avatar, IconButton } from '@material-ui/core';
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './chat.css';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
@@ -8,6 +8,12 @@ import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
 import axios from './axios';
 
 function Chat(props) {
+	const messageRef = useRef();
+	useEffect(() => {
+		if (messageRef.current) {
+			messageRef.current.scrollTop = messageRef.current.scrollHeight;
+		}
+	});
 	return (
 		<div className='chat'>
 			{props.currentFriend && (
@@ -29,7 +35,7 @@ function Chat(props) {
 							</IconButton>
 						</div>
 					</div>
-					<div className='chat_body'>
+					<div className='chat_body' ref={messageRef}>
 						{props.message.map((m) => (
 							<div
 								key={m._id}

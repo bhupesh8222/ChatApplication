@@ -10,6 +10,8 @@ import Button from '@material-ui/core/Button';
 import axios from './axios';
 import Pusher from 'pusher-js';
 import { useHistory } from 'react-router-dom';
+import Copyright from './Copyright.js';
+import Box from '@material-ui/core/Box';
 
 function MainComponent(CURRENT_USER) {
 	const history = useHistory();
@@ -67,7 +69,7 @@ function MainComponent(CURRENT_USER) {
 	//---------ACCESSING THE USER DETAILS-------------
 	//console.log(CURRENT_USER.location.state.user);
 	//----------------------------
-	const userDetails = CURRENT_USER.location.state.user;
+	//const userDetails = CURRENT_USER.location.state.user;
 	//console.log(userDetails);
 
 	//console.log(CURRENT_USER.location.state.user);
@@ -79,7 +81,7 @@ function MainComponent(CURRENT_USER) {
 			{CURRENT_USER.location.state && (
 				<div className='app_components'>
 					<Sidebar
-						userDetails={userDetails}
+						userDetails={CURRENT_USER.location.state.user}
 						getChatDetails={getChatDetails}
 						Logout={Logout}
 					/>
@@ -90,11 +92,12 @@ function MainComponent(CURRENT_USER) {
 							sendMessage={sendMessage}
 							setInput={setInput}
 							input={input}
-							currentUser={userDetails.username}
+							currentUser={CURRENT_USER.location.state.user.username}
 						/>
 					)}
 				</div>
 			)}
+
 			{!CURRENT_USER.location.state && (
 				<div>
 					<h1> ACCESS DENIED!</h1>

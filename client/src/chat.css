@@ -2,6 +2,7 @@
     display: flex;
     flex-direction: column;
     flex: 0.65;
+    background-color:rgb(218, 218, 218) ;
 }
 
 .chat_header{
@@ -9,6 +10,7 @@
     padding: 20px;
     align-items: center;
     border-bottom: 1px solid gray;
+    background-color: rgb(240, 240, 240);
 }
 
 .chat_header_info{
