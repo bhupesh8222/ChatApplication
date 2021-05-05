@@ -8,7 +8,7 @@ function Home() {
 		<div id='homeComponent'>
 			<h3>Welcome to Chat</h3>
 			<div>
-				<Link href='/login'>
+				<Link to='/login'>
 					<Button
 						className='buttons_landing'
 						variant='contained'
@@ -18,7 +18,7 @@ function Home() {
 				</Link>
 
 				<span> </span>
-				<Link href='/signup'>
+				<Link to='/signup'>
 					<Button
 						className='buttons_landing'
 						variant='contained'
