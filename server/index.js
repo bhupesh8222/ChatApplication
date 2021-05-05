@@ -12,6 +12,9 @@ import passportLocal from 'passport-local';
 const port = process.env.PORT || 2000;
 import Pusher from 'pusher';
 const app = express();
+import env from 'dotenv';
+
+env.config();
 
 app.use(express.json());
 
@@ -74,15 +77,14 @@ passport.serializeUser(userModel.serializeUser());
 passport.deserializeUser(userModel.deserializeUser());
 
 const pusher = new Pusher({
-	appId: '1192384',
-	key: '1daad050e7d8ba9c63ad',
+	appId: process.env.PUSHERAPPID_API_KEY,
+	key: process.env.PUSHER_API_KEY,
 	secret: 'b8d11efded9f95ec538a',
 	cluster: 'ap2',
 	useTLS: true,
 });
 
-const url =
-	'mongodb+srv://bhupesh:bhupesh@cluster0.etje3.mongodb.net/ChatApp?retryWrites=true&w=majority';
+const url = process.env.MONGODB_API_KEY;
 
 mongoose.connect(url, {
 	useCreateIndex: true,
@@ -298,6 +300,7 @@ app.post('/add', isloggedIn, async (req, res) => {
 
 app.post('/lastmessage', isloggedIn, async (req, res) => {
 	try {
+		//getting last mesage
 		const friend = req.body.friend;
 		const conversation = req.user.MyConversation.find(
 			(element) => element.friendName == friend

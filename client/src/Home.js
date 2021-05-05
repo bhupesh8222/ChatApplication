@@ -2,6 +2,7 @@ import React from 'react';
 import './Home.css';
 import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
+import Copyright from './Copyright.js';
 function Home() {
 	return (
 		<div id='homeComponent'>
@@ -25,6 +26,7 @@ function Home() {
 						SignUp
 					</Button>
 				</Link>
+				<Copyright />
 			</div>
 		</div>
 	);

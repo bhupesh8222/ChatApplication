@@ -16,7 +16,6 @@ function Sidebar(props) {
 	const [gotError, setgotError] = useState(false);
 	const [inputValue, setinputValue] = useState('');
 	const [foundUser, setfoundUser] = useState();
-	const [currentActive, setcurrentActive] = useState();
 	const element = useRef(null);
 	const [Selected, setSelected] = useState();
 	let user = props.userDetails;
