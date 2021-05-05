@@ -199,42 +199,6 @@ app.post('/message/add', isloggedIn, async (req, res) => {
 			await messagesFound.save();
 			res.send(messagesFound);
 		}
-
-		//FIRST TIME SENDING MESSAGE!
-		/*else {
-			console.log('FIRST TIME SENDING MESSAGE!');
-
-			const NewConversation = {
-				messages: [req.body],
-			};
-
-			const conversationCreated = await conversationModel.create(
-				NewConversation
-			);
-
-			console.log(conversationCreated);
-
-			conversation.chats = conversationCreated._id;
-			req.user.save();
-
-			//finding friend
-			const FriendFound = await userModel.findOne({
-				username: req.body.friend,
-			});
-
-			console.log('FRIEND FOUND', FriendFound);
-
-			//finding conversation
-			const FriendConversation = await FriendFound.MyConversation.find(
-				(element) => element.friendName == req.user.username
-			);
-
-			FriendConversation.chats = conversationCreated._id;
-
-			FriendFound.save();
-
-			res.send(conversationCreated.messages);
-		}*/
 	} catch (error) {
 		res.status(500).send(error);
 	}
@@ -325,6 +289,10 @@ app.post('/searchuser', isloggedIn, async (req, res) => {
 		res.status(500).send(error);
 	}
 });
+
+if (process.env.NODE_ENV == 'production') {
+	app.use(express.static('../client/build'));
+}
 
 app.listen(port, () => {
 	console.log('SERVER STARTED!');
