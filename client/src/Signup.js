@@ -46,7 +46,7 @@ export default function SignIn() {
 	const submitForm = async (e) => {
 		e.preventDefault();
 		axios
-			.post('http://localhost:2000/signup', {
+			.post('/signup', {
 				username: username,
 				password: password,
 				email: email,

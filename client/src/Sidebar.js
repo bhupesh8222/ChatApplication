@@ -23,7 +23,7 @@ function Sidebar(props) {
 	const SearchUser = (e) => {
 		e.preventDefault();
 		axios
-			.post('http://localhost:2000/searchuser', { userName: inputValue })
+			.post('/searchuser', { userName: inputValue })
 			.then((res) => {
 				if (!res.data.username) {
 					setgotError(true);
@@ -59,15 +59,13 @@ function Sidebar(props) {
 
 	//POTENTIAL BUG
 	const AddFriend = () => {
-		axios
-			.post('http://localhost:2000/add', { friend: foundUser })
-			.then((res) => {
-				console.log(res.data);
-				user = res.data;
-				setinputValue('');
-				setFriends(res.data.MyConversation);
-				history.push('/app', { user: res.data });
-			});
+		axios.post('/add', { friend: foundUser }).then((res) => {
+			console.log(res.data);
+			user = res.data;
+			setinputValue('');
+			setFriends(res.data.MyConversation);
+			history.push('/app', { user: res.data });
+		});
 	};
 
 	const chatDetailsBgColor = (e) => {

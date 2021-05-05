@@ -27,7 +27,7 @@ app.use(
 //WE CAN MAKE CORS POSSIBLE W/O CORS LIBRARY
 //cors library is doing these stuffs for us, i.e setting the access-control-allow-origin-response
 
-app.use(function (req, res, next) {
+/*app.use(function (req, res, next) {
 	// Website you wish to allow to connect
 	res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
 
@@ -49,14 +49,14 @@ app.use(function (req, res, next) {
 
 	// Pass to next layer of middleware
 	next();
-});
+});*/
 
-/*app.use(
+app.use(
 	cors({
-		origin: 'http://localhost:3000',
+		origin: 'https://mychatapplicationmern.herokuapp.com/',
 		credentials: true,
 	})
-);*/
+);
 app.use(cookieParser('This is the secret'));
 
 //import passportLocalMongoose from "passport-local-mongoose";
@@ -94,7 +94,7 @@ mongoose.connect(url, {
 
 const db = mongoose.connection;
 db.once('open', () => {
-	console.log('CONNECTED');
+	console.log('DB CONNECTED');
 	const msgCollection = db.collection('conversations');
 	const changeStream = msgCollection.watch();
 	changeStream.on('change', (change) => {
@@ -135,6 +135,7 @@ app.post(
 	'/login',
 	passport.authenticate('local', { session: true }),
 	(req, res) => {
+		console.log('LOGGING IN');
 		res.send(req.user);
 		//console.log(req.session);
 	}
@@ -287,9 +288,9 @@ app.post('/searchuser', isloggedIn, async (req, res) => {
 });
 
 if (process.env.NODE_ENV == 'production') {
-	app.use(express.static('../client/build'));
+	app.use(express.static('client/build'));
 }
 
 app.listen(port, () => {
-	console.log('SERVER STARTED!');
+	console.log('SERVER STARTED!', port);
 });
