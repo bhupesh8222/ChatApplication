@@ -157,10 +157,6 @@ function isloggedIn(req, res, next) {
 	}
 }
 
-app.get('/', isloggedIn, (req, res) => {
-	res.send(req.user);
-});
-
 //route to see conversation with a friend
 
 app.post('/chats', isloggedIn, async (req, res) => {
