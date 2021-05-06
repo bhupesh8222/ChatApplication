@@ -90,12 +90,15 @@ const pusher = new Pusher({
 const url = process.env.MONGODB_API_KEY;
 
 mongoose
-	.connect(url, {
-		useCreateIndex: true,
-		useUnifiedTopology: true,
-		useNewUrlParser: true,
-		useFindAndModify: false,
-	})
+	.connect(
+		'mongodb+srv://bhupesh:bhupesh@cluster0.etje3.mongodb.net/ChatApp?retryWrites=true&w=majority&ssl=true',
+		{
+			useCreateIndex: true,
+			useUnifiedTopology: true,
+			useNewUrlParser: true,
+			useFindAndModify: false,
+		}
+	)
 	.then((res) => console.log('DB CONNECTED'))
 	.catch((err) => console.log(err));
 
