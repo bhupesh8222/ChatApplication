@@ -89,15 +89,19 @@ const pusher = new Pusher({
 
 const url = process.env.MONGODB_API_KEY;
 
-mongoose.connect(url, {
-	useCreateIndex: true,
-	useUnifiedTopology: true,
-	useNewUrlParser: true,
-});
+mongoose
+	.connect(url, {
+		useCreateIndex: true,
+		useUnifiedTopology: true,
+		useNewUrlParser: true,
+		useFindAndModify: false,
+	})
+	.then((res) => console.log('DB CONNECTED'))
+	.catch((err) => console.log(err));
 
 const db = mongoose.connection;
 db.once('open', () => {
-	console.log('DB CONNECTED');
+	console.log('CONNECTION OPEN NOW');
 	const msgCollection = db.collection('conversations');
 	const changeStream = msgCollection.watch();
 	changeStream.on('change', (change) => {
