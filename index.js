@@ -53,7 +53,10 @@ app.use(
 
 app.use(
 	cors({
-		origin: 'https://mychatapplicationmern.herokuapp.com/',
+		origin: [
+			'https://mychatapplicationmern.herokuapp.com/',
+			'http://localhost:5000',
+		],
 		credentials: true,
 	})
 );

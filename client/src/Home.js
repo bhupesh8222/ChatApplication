@@ -1,7 +1,7 @@
 import React from 'react';
 import './Home.css';
 import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
+import { Link } from 'react-router-dom';
 import Copyright from './Copyright.js';
 function Home() {
 	return (
